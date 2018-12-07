@@ -1,22 +1,34 @@
 
 
 import os
-path="/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
-os.chdir(path)
-f=open("cacm.all","r")
-l=f.readlines()
-f.close()
+l = []
+try:
+    path="/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
+    os.chdir(path)
+    f=open("cacm.all","r")
+    l=f.readlines()
+    f.close()
+except:
+    None
+try:
+    path="/mnt/f/etudes/OSY/recherche_web/Data/Data/CACM/"
+    os.chdir(path)
+    f=open("cacm.all","r")
+    l=f.readlines()
+    f.close()
+except:
+    None
 sentences=[]
-i=0
-while i<len(l):
 
-    if l[i][0:2] in [".K",".I",".W"]:
-        j=i
-        while j<len(l):
-            if l[j][0]!=".": sentences.append(l[j])
-            j+=1
-        i=j
-    else: i+=1
-
+reading = False
+for line in l:
+    if line[0]==".":
+        if line[0:2] in [".K",".T",".W"]:
+            reading = True
+        else:
+            reading = False
+    else:
+        if reading:
+            sentences.append(line)
 
 print(sentences)
