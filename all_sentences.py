@@ -1,4 +1,5 @@
 import os
+import math
 from nltk.tokenize import RegexpTokenizer
 
 
@@ -33,7 +34,7 @@ def extractTokens(lines):
 
     print("Number of tokens : {}".format(nbrTokens))
     print("Vocabulary size : {}".format(len(tokens)))
-    return tokens
+    return (tokens, nbrTokens)
     #print(tokens)
 
 
@@ -56,8 +57,16 @@ if __name__ == '__main__':
         None
     
     processed_lines = extractLines(raw_lines)
-    tokens = extractTokens(processed_lines[:int(len(processed_lines)/2)])
-    tokens = extractTokens(processed_lines)
-
+    nbrT1 = 0
+    nbrT2 = 0
+    (tokens2, nbrT2) = extractTokens(processed_lines[:int(len(processed_lines)/2)])
+    (tokens1, nbrT1) = extractTokens(processed_lines)
+    nbrM1 = len(tokens1)
+    nbrM2 = len(tokens2)
+    var_b = (math.log(nbrM1) - math.log(nbrM2)) / math.log(nbrT1/nbrT2)
+    var_k = nbrM1/math.pow(nbrT1, var_b)
+    print("Result : (k:{}) (b:{})".format(var_k, var_b))
+    print("Prediction for 100.000 tokens : {}".format(var_k * math.pow(100000, var_b)))
+    print("Prediction for 1.000.000 tokens : {}".format(var_k * math.pow(1000000, var_b)))
     
 
