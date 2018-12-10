@@ -1,6 +1,7 @@
 import os
 import math
 from nltk.tokenize import RegexpTokenizer
+import matplotlib.pyplot as pp
 
 
 def extractLines(lines):
@@ -68,5 +69,26 @@ if __name__ == '__main__':
     print("Result : (k:{}) (b:{})".format(var_k, var_b))
     print("Prediction for 100.000 tokens : {}".format(var_k * math.pow(100000, var_b)))
     print("Prediction for 1.000.000 tokens : {}".format(var_k * math.pow(1000000, var_b)))
+
+    #set pour éliminer les doublons
+    frequences=list(set(tokens1.values()))
+    frequences.sort()
+    rangs=[frequences.index(e)+1 for e in frequences]
+    log_frequences=[math.log(e) for e in frequences]
+    log_rangs=[math.log(e) for e in rangs]
+
+    pp.subplot(2, 1, 1)
+    pp.plot(rangs,frequences)
+    pp.xlabel("rang")
+    pp.ylabel("frequence")
+
+
+    pp.subplot(2, 1, 2)
+    pp.plot(log_rangs,log_frequences)
+    pp.xlabel("log(rang)")
+    pp.ylabel("log(frequence)")
+    pp.show()
+
+
     
 
