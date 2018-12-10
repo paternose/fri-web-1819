@@ -89,6 +89,3 @@ if __name__ == '__main__':
     pp.ylabel("log(frequence)")
     pp.show()
 
-
-    
-
