@@ -31,6 +31,7 @@ for line in l:
     else:
         if reading:
             sentences.append(line)
+
 tokens=dict()
 tokenizer = RegexpTokenizer(r'\w+')
 for sentence in sentences:
@@ -41,4 +42,5 @@ for sentence in sentences:
         #si le token n'est pas encore dans le dictionnaire
         except:
             tokens[token.lower()]=1
+
 
