@@ -1,25 +1,45 @@
 from nltk.tokenize import RegexpTokenizer
+from tqdm import tqdm
 
 
+def extractRawLines():
+    path1="/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
+    path2="/mnt/f/etudes/OSY/recherche_web/Data/Data/CACM/"
+    raw_lines = []
+    print("Loading file ..")
+    try:
+        f=open(path1 + "cacm.all","r")
+        raw_lines=f.readlines()
+        f.close()
+    except:
+        None
+    try:
+        f=open(path2 + "cacm.all","r")
+        raw_lines=f.readlines()
+        f.close()
+    except:
+        None
+    return raw_lines
+    
 
 def extractDocs(raw_lines):
     docs = []
-    current_doc = []
+    current_doc = ''
     
     reading = False
-    for line in raw_lines:
+    for line in tqdm(raw_lines):
         if line[0]==".":
             if line[0:2] == ".I":
                 if len(current_doc):
                     docs.append(current_doc[:])
-                current_doc = []
+                current_doc = ''
             elif line[0:2] in [".K",".T",".W"]:
                 reading = True
             else:
                 reading = False
         else:
             if reading:
-                current_doc.append(line)
+                current_doc += line
 
     return docs
 
@@ -58,27 +78,24 @@ def invertBlock(block):
     return invertedIndex
 
 
+def createIndex():
+    index = dict()
+    raw_lines = extractRawLines()
+    docs_lines = extractDocs(raw_lines)
+    index = dict()
+#    index = invertBlock(docs_lines)
+    return index
+
+
+
 if __name__ == '__main__':
-    # lancement du serveur
-    path1="/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
-    path2="/mnt/f/etudes/OSY/recherche_web/Data/Data/CACM/"
-    raw_lines = []
-    try:
-        f=open(path1 + "cacm.all","r")
-        raw_lines=f.readlines()
-        f.close()
-    except:
-        None
-    try:
-        f=open(path2 + "cacm.all","r")
-        raw_lines=f.readlines()
-        f.close()
-    except:
-        None
+    raw_lines = extractRawLines()
     
+    print("Extracting lines:")
     docs_lines = extractDocs(raw_lines)
     doc_tokens = []
-    for doc in docs_lines:
+    print("Extracting tokens:")
+    for doc in tqdm(docs_lines):
         doc_tokens.append(extractTokens(doc))
     print("{} docs extracted.".format(len(doc_tokens)))
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
