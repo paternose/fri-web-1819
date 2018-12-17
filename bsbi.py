@@ -38,17 +38,22 @@ def extractTokens(lines):
 
 """
 block example: key: documentId, value: lines
-block = {1: ["aaa\n", "bbb\n"], 2: ["ccc\n", "ddd\n"],3: ["ccc\n","eee\n"]}
+block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc cc\n", "ddd\n"],3: ["ccc\n","eee\n"]}
 """
-
+def countToken(token, lines):
+    counter=0
+    tokenizer = RegexpTokenizer(r'\w+')
+    for line in lines:
+        counter+=tokenizer.tokenize(line).count(token)
+    return counter
 def invertBlock(block):
     invertedIndex = dict()
     for documentId in block.keys():
         for token in extractTokens(block[documentId]):
             try:
-                invertedIndex[token].add(documentId)
+                invertedIndex[token].add((documentId,countToken(token, block[documentId])))
             except:
-                invertedIndex[token]={documentId}
+                invertedIndex[token]={(documentId, countToken(token,block[documentId]))}
     return invertedIndex
 
 
@@ -75,3 +80,6 @@ if __name__ == '__main__':
     for doc in docs_lines:
         doc_tokens.append(extractTokens(doc))
     print("{} docs extracted.".format(len(doc_tokens)))
+    block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
+    print("Exemple de block", block)
+    print("Index inversé", invertBlock(block))
