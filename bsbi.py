@@ -46,6 +46,7 @@ def countToken(token, lines):
     for line in lines:
         counter+=tokenizer.tokenize(line).count(token)
     return counter
+
 def invertBlock(block):
     invertedIndex = dict()
     for documentId in block.keys():
