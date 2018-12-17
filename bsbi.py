@@ -36,6 +36,22 @@ def extractTokens(lines):
 
 
 
+"""
+block example: key: documentId, value: lines
+block = {1: ["aaa\n", "bbb\n"], 2: ["ccc\n", "ddd\n"],3: ["ccc\n","eee\n"]}
+"""
+
+def invertBlock(block):
+    invertedIndex = dict()
+    for documentId in block.keys():
+        for token in extractTokens(block[documentId]):
+            try:
+                invertedIndex[token].add(documentId)
+            except:
+                invertedIndex[token]={documentId}
+    return invertedIndex
+
+
 if __name__ == '__main__':
     # lancement du serveur
     path1="/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
