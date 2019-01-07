@@ -23,15 +23,17 @@ def extractRawLines():
     
 
 def extractDocs(raw_lines):
-    docs = []
+    docs = {}
     current_doc = ''
-    
+    i = 0
     reading = False
+
     for line in tqdm(raw_lines):
         if line[0]==".":
             if line[0:2] == ".I":
                 if len(current_doc):
-                    docs.append(current_doc[:])
+                    docs[i] = current_doc[:]
+                    i += 1
                 current_doc = ''
             elif line[0:2] in [".K",".T",".W"]:
                 reading = True
@@ -68,7 +70,7 @@ def countToken(token, lines):
     return counter
 def invertBlock(block):
     invertedIndex = dict()
-    for documentId in block.keys():
+    for documentId in tqdm(block.keys()):
         for token in extractTokens(block[documentId]):
             try:
                 invertedIndex[token].add((documentId,countToken(token, block[documentId])))
@@ -90,13 +92,13 @@ def createIndex():
 if __name__ == '__main__':
     raw_lines = extractRawLines()
     
-    print("Extracting lines:")
-    docs_lines = extractDocs(raw_lines)
-    doc_tokens = []
-    print("Extracting tokens:")
-    for doc in tqdm(docs_lines):
-        doc_tokens.append(extractTokens(doc))
-    print("{} docs extracted.".format(len(doc_tokens)))
+    print("Extracting docs:")
+    docs = extractDocs(raw_lines)
+    print("{} documents found.".format(len(docs.keys())))
+    print("Extracting index ...")
+    index = invertBlock(docs)
+    print("index size : ", len(index.keys()))
+    print(index.keys())
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
     print("Exemple de block", block)
     print("Index inversé", invertBlock(block))
