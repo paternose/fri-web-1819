@@ -24,7 +24,7 @@ def extractRawLines():
 
 def extractDocs(raw_lines):
     docs = {}
-    current_doc = ''
+    current_doc = []
     i = 0
     reading = False
 
@@ -34,14 +34,14 @@ def extractDocs(raw_lines):
                 if len(current_doc):
                     docs[i] = current_doc[:]
                     i += 1
-                current_doc = ''
+                current_doc = []
             elif line[0:2] in [".K",".T",".W"]:
                 reading = True
             else:
                 reading = False
         else:
             if reading:
-                current_doc += line
+                current_doc.append(line)
 
     return docs
 
@@ -60,7 +60,7 @@ def extractTokens(lines):
     tokens = []
     tokenizer = RegexpTokenizer(r'\w+')
     for line in lines:
-        for token in tokenizer.tokenize(line):
+        for token in tokenizer.tokenize(line.lower()):
             if token not in tokens:
                 tokens.append(token)
     return tokens
@@ -80,12 +80,21 @@ def countToken(token, lines):
 
 def invertBlock(block):
     invertedIndex = dict()
+    tokenizer = RegexpTokenizer(r'\w+')
     for documentId in tqdm(block.keys()):
-        for token in extractTokens(block[documentId]):
-            try:
-                invertedIndex[token].add((documentId,countToken(token, block[documentId])))
-            except:
-                invertedIndex[token]={(documentId, countToken(token,block[documentId]))}
+        for line in block[documentId]:
+            for token in tokenizer.tokenize(line.lower()):
+
+                try:
+                    invertedIndex[token][documentId]+=1
+                except:
+                    try:
+                        invertedIndex[token][documentId]=1
+                    except:
+                        invertedIndex[token]=dict()
+                        invertedIndex[token][documentId] = 1
+
+
     return invertedIndex
 
 
@@ -99,16 +108,18 @@ def createIndex():
 
 
 
-# if __name__ == '__main__':
-raw_lines = extractRawLines()
 
-print("Extracting docs:")
-docs = extractDocs(raw_lines)
-print("{} documents found.".format(len(docs.keys())))
-print("Extracting index ...")
-index = invertBlock(docs)
-print("index size : ", len(index.keys()))
-print(index.keys())
-block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
-print("Exemple de block", block)
-print("Index inversé", invertBlock(block))
+if __name__ == '__main__':
+    raw_lines = extractRawLines()
+
+    print("Extracting docs:")
+    docs = extractDocs(raw_lines)
+    print("{} documents found.".format(len(docs.keys())))
+    #    print(docs)
+    print("Extracting index ...")
+    index = invertBlock(docs)
+    print("index size : ", len(index.keys()))
+    #    print(index.keys())
+    block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
+    print("Exemple de block", block)
+    print("Index inversé", invertBlock(block))
