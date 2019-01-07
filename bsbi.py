@@ -24,7 +24,7 @@ def extractRawLines():
 
 def extractDocs(raw_lines):
     docs = {}
-    current_doc = ''
+    current_doc = []
     i = 0
     reading = False
 
@@ -34,14 +34,14 @@ def extractDocs(raw_lines):
                 if len(current_doc):
                     docs[i] = current_doc[:]
                     i += 1
-                current_doc = ''
+                current_doc = []
             elif line[0:2] in [".K",".T",".W"]:
                 reading = True
             else:
                 reading = False
         else:
             if reading:
-                current_doc += line
+                current_doc.append(line)
 
     return docs
 
@@ -95,10 +95,11 @@ if __name__ == '__main__':
     print("Extracting docs:")
     docs = extractDocs(raw_lines)
     print("{} documents found.".format(len(docs.keys())))
+#    print(docs)
     print("Extracting index ...")
     index = invertBlock(docs)
     print("index size : ", len(index.keys()))
-    print(index.keys())
+#    print(index.keys())
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
     print("Exemple de block", block)
     print("Index inversé", invertBlock(block))
