@@ -99,16 +99,16 @@ def createIndex():
 
 
 
-if __name__ == '__main__':
-    raw_lines = extractRawLines()
-    
-    print("Extracting docs:")
-    docs = extractDocs(raw_lines)
-    print("{} documents found.".format(len(docs.keys())))
-    print("Extracting index ...")
-    index = invertBlock(docs)
-    print("index size : ", len(index.keys()))
-    print(index.keys())
-    block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
-    print("Exemple de block", block)
-    print("Index inversé", invertBlock(block))
+# if __name__ == '__main__':
+raw_lines = extractRawLines()
+
+print("Extracting docs:")
+docs = extractDocs(raw_lines)
+print("{} documents found.".format(len(docs.keys())))
+print("Extracting index ...")
+index = invertBlock(docs)
+print("index size : ", len(index.keys()))
+print(index.keys())
+block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
+print("Exemple de block", block)
+print("Index inversé", invertBlock(block))
