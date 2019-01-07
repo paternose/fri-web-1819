@@ -75,7 +75,7 @@ def countToken(token, lines):
     counter=0
     tokenizer = RegexpTokenizer(r'\w+')
     for line in lines:
-        counter+=tokenizer.tokenize(line).count(token)
+        counter+=tokenizer.tokenize(line).count(token.lower())
     return counter
 
 def invertBlock(block):
@@ -94,9 +94,14 @@ def invertBlock(block):
                         invertedIndex[token]=dict()
                         invertedIndex[token][documentId] = 1
 
-
     return invertedIndex
 
+def findDocsWith(index, token):
+    docs = []
+    if token in index.keys():
+        for (doc, nbr) in index[token]:
+            docs.append(doc)
+    return docs
 
 def createIndex():
     index = dict()
@@ -111,7 +116,8 @@ def createIndex():
 
 if __name__ == '__main__':
     raw_lines = extractRawLines()
-
+    token_test = 'much'
+    
     print("Extracting docs:")
     docs = extractDocs(raw_lines)
     print("{} documents found.".format(len(docs.keys())))
@@ -119,7 +125,11 @@ if __name__ == '__main__':
     print("Extracting index ...")
     index = invertBlock(docs)
     print("index size : ", len(index.keys()))
-    #    print(index.keys())
+#    print(index.keys())
+    docs_with_token = findDocsWith(index, token_test)
+    print("Docs with the token '{}' inside :".format(token_test))
+    print(docs_with_token)
+    print(index[token_test])
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
     print("Exemple de block", block)
     print("Index inversé", invertBlock(block))
