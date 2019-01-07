@@ -43,6 +43,15 @@ def extractDocs(raw_lines):
 
     return docs
 
+def getBlock(docs, docIds, length_limit):
+    counter=0
+    block=dict()
+    i=0
+    for doc in docs:
+        if counter+len(doc)<=length_limit: block[docIds[i]]=doc
+        i+=1
+    return block
+
 def extractTokens(lines):
     ## Takes an array of lines as input, returns an array of tokens (with
     # duplicates)
