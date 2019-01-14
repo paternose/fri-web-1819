@@ -45,13 +45,17 @@ def vectorialSearch(query, collection, index):
     return score
 
 if __name__ == '__main__':
+   
     C = {1: ["aaa aaa eee\n", "bbb\n"], 2: ["ccc \n", "ddd\n"], 3: ["ccc eee\n", "a\n"]}
     length=len(C)
     #index: the output of bsbi.py
     index={'bbb': {1: 1}, 'eee': {1:2, 3: 1}, 'aaa': {1: 2, 2: 1}, 'ddd': {2: 1}, 'ccc': {2: 1, 3: 1}}
+    
     print("Le document 2 est le seul qui ne contient pas 'eee' ")
     print(vectorialSearch("eee", C, index))
+    
     print("")
+    
     print("Le document 2 est le seul qui ne contient pas 'eee' mais il contient 'ccc' ")
     print(vectorialSearch("eee ccc", C, index))
 
