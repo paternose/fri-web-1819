@@ -15,7 +15,7 @@ def vectorialSearch(query, collection, index):
     Nd=dict()
     for doc in collection.keys():
         Nd[doc]=sum([1 for document in collection])
-    Nq=0
+    Nq=0 
     score=dict()
     for j in range(1,length+1):
         score[j]=0
