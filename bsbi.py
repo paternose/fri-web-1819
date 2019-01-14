@@ -78,7 +78,7 @@ def countToken(token, lines):
     counter = 0
     tokenizer = RegexpTokenizer(r'\w+')
     for line in lines:
-        counter += tokenizer.tokenize(line).count(token)
+        counter += tokenizer.tokenize(line).count(token.lower())
     return counter
 
 
@@ -110,9 +110,56 @@ def createIndex():
     return index
 
 
+def findDocsWith(index, token):
+    docs = []
+    if type(token) is set:
+        return token
+    else:
+        if token in index.keys():
+            for doc in index[token].keys():
+                docs.append(doc)
+        return set(docs)
+
+
+def operatorOR(set1, set2):
+    return set1 | set2
+
+
+def operatorAND(set1, set2):
+    return set1 & set2
+
+
+def operatorNOT(index, doc_set, token):
+    return doc_set - findDocsWith(index, token)
+
+
+def operatorMultiOR(index, *arg):
+    return operatorMulti(index, operatorOR, *arg)
+
+
+def operatorMultiAND(index, *arg):
+    return operatorMulti(index, operatorAND, *arg)
+
+
+def operatorMulti(index, func, *arg):
+    currentSet = findDocsWith(index, arg[0])
+    for i in range(1, len(arg)):
+        currentSet = func(currentSet, findDocsWith(index, arg[i]))
+    return currentSet
+
+
+def research(index, doc_set, expression):
+    print("Starting expression : {}".format(expression))
+    expression = expression.replace('OR(', 'operatorMultiOR(index, ')
+    expression = expression.replace('AND(', 'operatorMultiAND(index, ')
+    expression = expression.replace('NOT(', 'operatorNOT(index, doc_set, ')
+    print("Corrected expression : {}".format(expression))
+    return eval(expression)
+
+
 if __name__ == '__main__':
     raw_lines = extractRawLines()
-
+    research_expr = "AND(NOT('formally'), OR('lecture', 'straightforward', 'formally'))"
     print("Extracting docs:")
     docs = extractDocs(raw_lines)
     print("{} documents found.".format(len(docs.keys())))
@@ -121,6 +168,13 @@ if __name__ == '__main__':
     index = invertBlock(docs)
     print("index size : ", len(index.keys()))
     #    print(index.keys())
+    print("Executing research ...")
+    research_result = research(index, set(docs.keys()), research_expr)
+    print("Results from research {} :".format(research_expr))
+    print(research_result)
+    print(index['lecture'])
+    #    print(index['straightforward'])
+    print(index['formally'])
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
     print("Exemple de block", block)
     print("Index inversé", invertBlock(block))
