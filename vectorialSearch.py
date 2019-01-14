@@ -8,7 +8,7 @@ def tf(term,document):
     #potential optimization: remove count and make loop instead
     return sum([tokenizer.tokenize(document[i].lower()).count(term.lower()) for i in range(len(document))])
 def idf(term, collection, length):
-    """"we give length=len(collection) as an argument to avoid calculating at each iteration"""
+    """"we give length=len(collection) as an argument to avoid calculating it at each iteration"""
     return log(length/len(index[term.lower()]))
 
 def vectorialSearch(query, collection, index):
