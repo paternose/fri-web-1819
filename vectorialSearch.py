@@ -52,13 +52,17 @@ if __name__ == '__main__':
     # length=len(C)
     #index: the output of bsbi.py
     index={'bbb': {1: 1}, 'eee': {1:2, 3: 1}, 'aaa': {1: 2, 2: 1}, 'ddd': {2: 1}, 'ccc': {2: 1, 3: 1}}
-    print("Le document 1 est le seul qui contient 'bbb'")
+    print("Query : ", "'bbb'")
+    print("Document 1 is the only one containing 'bbb' ")
     print(vectorialSearch("bbb", C, index),"\n")
 
-    print("Le document 2 est le seul qui ne contient pas 'eee' ")
+    print("Query : ", "'eee'")
+    print("Document 2 is the only one not containing  'eee' ")
     print(vectorialSearch("eee", C, index),"\n")
 
-    print("Le document 2 est le seul qui ne contient pas 'eee' mais il contient 'ccc' ")
+    print("Query : ", "'eee ccc'")
+    print("Document 2 is the only one not containing 'eee'  but containing 'ccc' ")
+    print("Document 1 and 2 have the same score. Document 3 has higher score because he contains both of the tokens 'eee' and 'ccc' ")
     print(vectorialSearch("eee ccc", C, index))
 
 
