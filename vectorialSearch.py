@@ -68,13 +68,3 @@ if __name__ == '__main__':
     print("Document 2 is the only one not containing 'eee'  but containing 'ccc' ")
     print("Document 1 and 2 have the same score. Document 3 has higher score because he contains both of the tokens 'eee' and 'ccc' ")
     print(vectorialSearch("eee ccc", C, index))
-
-
-
-
-
-
-
-
-
-

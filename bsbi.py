@@ -1,5 +1,7 @@
 from nltk.tokenize import RegexpTokenizer
 from tqdm import tqdm
+from math import log
+
 
 
 def extractRawLines():
@@ -157,6 +159,7 @@ def research(index, doc_set, expression):
     return eval(expression)
 
 
+
 if __name__ == '__main__':
     raw_lines = extractRawLines()
     research_expr = "AND(NOT('formally'), OR('lecture', 'straightforward', 'formally'))"
@@ -175,6 +178,7 @@ if __name__ == '__main__':
     print(index['lecture'])
     #    print(index['straightforward'])
     print(index['formally'])
+    print("\nInverted index test\n")
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
-    print("Exemple de block", block)
-    print("Index inversé", invertBlock(block))
+    print("Block example", block)
+    print("Inverted index", invertBlock(block))
