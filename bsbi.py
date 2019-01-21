@@ -27,7 +27,7 @@ def extractRawLines():
 def extractDocs(raw_lines):
     docs = {}
     current_doc = []
-    i = 0
+    i = 1
     reading = False
 
     for line in tqdm(raw_lines):
@@ -160,6 +160,64 @@ def research(index, doc_set, expression):
 
 
 
+"""Vectorial Search"""
+def tf(term,document):
+    tokenizer = RegexpTokenizer(r'\w+')
+    return sum([tokenizer.tokenize(document[i].lower()).count(term.lower()) for i in range(len(document))])
+
+def tf_index(term, document_id, index):
+    if term in index.keys():
+        if document_id in index[term].keys():
+            return index[term][document_id]
+        else:
+            return 0
+    else:
+        return 0
+
+def idf(term, index, length):
+    """"we give length=len(collection) as an argument to avoid calculating it at each iteration"""
+    try:
+        return log(length/len(index[term.lower()]))
+    except KeyError:
+        return 0
+def vectorialSearch(query, collection, index):
+    length=len(collection)
+    query_words=query.split()
+    Nd=dict()
+
+    for doc in collection.keys():
+        Nd[doc]=sum([1 for document in collection])
+    Nq=0
+    score=dict()
+    for j in collection.keys():
+        score[j]=0
+    W=dict()
+    W['query_words']=dict()
+    for i in range(1,len(query_words)+1):
+        try:
+            # print("query_words",query_words)
+            # print("collection",collection)
+            W['query_words'][query_words[i-1]]=tf(query_words[i-1],query)*idf(query_words[i-1], index, length)
+            Nq+=(W['query_words'][query_words[i-1]])**2
+            L=index[query_words[i-1]].keys()
+            # print("L", L)
+
+            for j in L:
+                try:
+                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_words[i-1],j, index)*idf(query_words[i-1], index, length)
+                #if j not in W keys
+                except:
+                    W[j]=dict()
+                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_words[i-1],j, index)*idf(query_words[i-1], index, length)
+                score[j]+=(W[j][query_words[i-1]])**2
+        except KeyError:
+            pass
+    for j in collection.keys():
+        if ((Nd[j]*Nq)**0.5)!=0:
+            score[j]=score[j]/((Nd[j]*Nq)**0.5)
+
+    return score
+
 if __name__ == '__main__':
     raw_lines = extractRawLines()
     research_expr = "AND(NOT('formally'), OR('lecture', 'straightforward', 'formally'))"
@@ -178,6 +236,15 @@ if __name__ == '__main__':
     print(index['lecture'])
     #    print(index['straightforward'])
     print(index['formally'])
+
+    print("\nVectorial Search Test\n")
+    print("Query : ", "'projects'")
+    scores=vectorialSearch("projects", docs, index)
+    print("scores",scores)
+    print("Score of document 1 that do not contain 'projects' :", scores[1])
+    print("Score of document 1735 that contains 'projects' :", scores[1735])
+    print("Score of document 2311 that contains 'projects' :", scores[2311])
+
     print("\nInverted index test\n")
     block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
     print("Block example", block)
