@@ -193,23 +193,23 @@ def vectorialSearch(query, collection, index):
         score[j]=0
     W=dict()
     W['query_words']=dict()
-    for i in range(1,len(query_words)+1):
+    for query_word in query_words:
         try:
             # print("query_words",query_words)
             # print("collection",collection)
-            W['query_words'][query_words[i-1]]=tf(query_words[i-1],query)*idf(query_words[i-1], index, length)
-            Nq+=(W['query_words'][query_words[i-1]])**2
-            L=index[query_words[i-1]].keys()
+            W['query_words'][query_word]=tf(query_word,query)*idf(query_word, index, length)
+            Nq+=(W['query_words'][query_word])**2
+            L=index[query_word].keys()
             # print("L", L)
 
             for j in L:
                 try:
-                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_words[i-1],j, index)*idf(query_words[i-1], index, length)
+                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_word,j, index)*idf(query_word, index, length)
                 #if j not in W keys
                 except:
                     W[j]=dict()
-                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_words[i-1],j, index)*idf(query_words[i-1], index, length)
-                score[j]+=(W[j][query_words[i-1]])**2
+                    W[j][query_word]=Nd[j]*tf_index(query_word,j, index)*idf(query_word, index, length)
+                score[j]+=(W[j][query_word])**2
         except KeyError:
             pass
     for j in collection.keys():
