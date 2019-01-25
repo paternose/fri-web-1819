@@ -190,17 +190,31 @@ def pTf_index(term, document, index):
 def pDf(term, index, length):
     return 1
 
-def n(doc):
-    return 1
-
-
-def vectorialSearch(query, collection, index, pTf, pTf_index, pDf):
-    length=len(collection)
-    query_words=query.split()
-    Nd=dict()
+def generate_nd(collection, normalized = False):
+    tokenizer = RegexpTokenizer(r'\w+')
+    nd = dict()
+    for doc in collection.keys():
+        nd[doc]=1.
+    if not normalized:
+        return nd
 
     for doc in collection.keys():
-        Nd[doc]=n(doc)
+        nbr_words = 0.
+        for line in collection[doc]:
+            nbr_words += len(tokenizer.tokenize(line))
+        nd[doc] /= nbr_words**.5
+
+    return nd
+
+
+
+def vectorialSearch(query, collection, index, pTf, pTf_index, pDf, generate_nd):
+    length=len(collection)
+    query_words=query.split()
+    Nd=generate_nd(collection)
+
+    # for doc in collection.keys():
+    #     Nd[doc]=1
     Nq=0
     score=dict()
     for j in collection.keys():
@@ -254,7 +268,7 @@ if __name__ == '__main__':
     print("\nVectorial Search Test\n")
     print('Test 1 : ptf=tf, pdf=1, Nd=1')
     print("Query : ", "'projects'")
-    scores=vectorialSearch("projects", docs, index, pTf, pTf_index, pDf)
+    scores=vectorialSearch("projects", docs, index, pTf, pTf_index, pDf, generate_nd)
     print("scores",scores)
     print("Score of document 1 that do not contain 'projects' :", scores[1])
     print("Score of document 1735 that contains 'projects' :", scores[1735])
