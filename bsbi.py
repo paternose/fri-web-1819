@@ -190,12 +190,11 @@ def pTf_index(term, document, index):
 def pDf(term, index, length):
     return 1
 
-
-#nd: facteur de normalisation (page 110)
-def n(document):
+def n(doc):
     return 1
 
-def vectorialSearch(query, collection, index):
+
+def vectorialSearch(query, collection, index, pTf, pTf_index, pDf):
     length=len(collection)
     query_words=query.split()
     Nd=dict()
@@ -253,8 +252,9 @@ if __name__ == '__main__':
     print(index['formally'])
 
     print("\nVectorial Search Test\n")
+    print('Test 1 : ptf=tf, pdf=1, Nd=1')
     print("Query : ", "'projects'")
-    scores=vectorialSearch("projects", docs, index)
+    scores=vectorialSearch("projects", docs, index, pTf, pTf_index, pDf)
     print("scores",scores)
     print("Score of document 1 that do not contain 'projects' :", scores[1])
     print("Score of document 1735 that contains 'projects' :", scores[1735])
