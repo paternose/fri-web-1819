@@ -190,10 +190,22 @@ def pTf_index(term, document, index):
 def pDf(term, index, length):
     return 1
 
+def generate_nd(collection, normalized = False):
+    tokenizer = RegexpTokenizer(r'\w+')
+    nd = dict()
+    for doc in collection.keys():
+        nd[doc]=1.
+    if not normalized:
+        return nd
 
-#nd: facteur de normalisation (page 110)
-def n(document):
-    return 1
+    for doc in collection.keys():
+        nbr_words = 0.
+        for line in collection[doc]:
+            nbr_words += len(tokenizer.tokenize(line))
+        nd[doc] /= nbr_words**.5
+
+    return nd
+
 
 def vectorialSearch(query, collection, index):
     length=len(collection)
