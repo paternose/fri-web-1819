@@ -180,13 +180,27 @@ def idf(term, index, length):
         return log(length/len(index[term.lower()]))
     except KeyError:
         return 0
+
+def pTf(term, document):
+    return tf(term, document)
+
+def pTf_index(term, document, index):
+    return tf_index(term, document, index)
+
+def pDf(term, index, length):
+    return 1
+
+#nd: facteur de normalisation (page 110)
+def n(document):
+    return 1
+
 def vectorialSearch(query, collection, index):
     length=len(collection)
     query_words=query.split()
     Nd=dict()
 
     for doc in collection.keys():
-        Nd[doc]=sum([1 for document in collection])
+        Nd[doc]=n(doc)
     Nq=0
     score=dict()
     for j in collection.keys():
@@ -197,18 +211,18 @@ def vectorialSearch(query, collection, index):
         try:
             # print("query_words",query_words)
             # print("collection",collection)
-            W['query_words'][query_word]=tf(query_word,query)*idf(query_word, index, length)
+            W['query_words'][query_word]=pTf(query_word,query)*pDf(query_word, index, length)
             Nq+=(W['query_words'][query_word])**2
             L=index[query_word].keys()
             # print("L", L)
 
             for j in L:
                 try:
-                    W[j][query_words[i - 1]]=Nd[j]*tf_index(query_word,j, index)*idf(query_word, index, length)
+                    W[j][query_words[i - 1]]=Nd[j]*pTf_index(query_word,j, index)*pDf(query_word, index, length)
                 #if j not in W keys
                 except:
                     W[j]=dict()
-                    W[j][query_word]=Nd[j]*tf_index(query_word,j, index)*idf(query_word, index, length)
+                    W[j][query_word]=Nd[j]*pTf_index(query_word,j, index)*pDf(query_word, index, length)
                 score[j]+=(W[j][query_word])**2
         except KeyError:
             pass
