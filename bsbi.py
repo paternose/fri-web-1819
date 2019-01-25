@@ -190,6 +190,7 @@ def pTf_index(term, document, index):
 def pDf(term, index, length):
     return 1
 
+
 #nd: facteur de normalisation (page 110)
 def n(document):
     return 1
