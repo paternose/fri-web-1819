@@ -20,7 +20,7 @@ def extractRawLines():
         raw_lines = f.readlines()
         f.close()
     except:
-        None
+        print("There is a problem loading file")
     return raw_lines
 
 
