@@ -1,11 +1,11 @@
 from nltk.tokenize import RegexpTokenizer
 from tqdm import tqdm
 from math import log
-
+import time
 
 
 def extractRawLines():
-    path1 = "/home/insight/Documents/OSY/RechercheWeb/FRI_WEB_2018_2019/Cours/Projet/Data/CACM/"
+    path1 = "/home/insight/Documents/OSY/RechercheWeb/cacm/"
     path2 = "/mnt/f/etudes/OSY/recherche_web/Data/Data/CACM/"
     raw_lines = []
     print("Loading file ..")
@@ -20,7 +20,7 @@ def extractRawLines():
         raw_lines = f.readlines()
         f.close()
     except:
-        print("There is a problem loading file")
+        None
     return raw_lines
 
 
@@ -247,14 +247,22 @@ def vectorialSearch(query, collection, index, pTf, pTf_index, pDf, generate_nd):
     return score
 
 if __name__ == '__main__':
+    print("\nInverted index demo\n")
+    block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
+    print("Block example", block)
+    print("Inverted index", invertBlock(block))
+
     raw_lines = extractRawLines()
     research_expr = "AND(NOT('formally'), OR('lecture', 'straightforward', 'formally'))"
     print("Extracting docs:")
     docs = extractDocs(raw_lines)
-    print("{} documents found.".format(len(docs.keys())))
+    print("{} documents found   .".format(len(docs.keys())))
     #    print(docs)
     print("Extracting index ...")
+    t1 = time.time()
     index = invertBlock(docs)
+    t2 = time.time()
+    print("\n\nIndexaton time :", t2 - t1, )
     print("index size : ", len(index.keys()))
     #    print(index.keys())
     print("Executing research ...")
@@ -265,16 +273,4 @@ if __name__ == '__main__':
     #    print(index['straightforward'])
     print(index['formally'])
 
-    print("\nVectorial Search Test\n")
-    print('Test 1 : ptf=tf, pdf=1, Nd=1')
-    print("Query : ", "'projects'")
-    scores=vectorialSearch("projects", docs, index, pTf, pTf_index, pDf, generate_nd)
-    print("scores",scores)
-    print("Score of document 1 that do not contain 'projects' :", scores[1])
-    print("Score of document 1735 that contains 'projects' :", scores[1735])
-    print("Score of document 2311 that contains 'projects' :", scores[2311])
 
-    print("\nInverted index test\n")
-    block = {1: ["aaa aaa\n", "bbb\n"], 2: ["ccc aaa\n", "ddd\n"], 3: ["ccc\n", "eee\n"]}
-    print("Block example", block)
-    print("Inverted index", invertBlock(block))
