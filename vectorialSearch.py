@@ -5,6 +5,52 @@ from bsbi import*
 import time
 import operator
 
+
+def tf(term,document):
+    tokenizer = RegexpTokenizer(r'\w+')
+    return sum([tokenizer.tokenize(document[i].lower()).count(term.lower()) for i in range(len(document))])
+
+def tf_index(term, document_id, index):
+    if term in index.keys():
+        if document_id in index[term].keys():
+            return index[term][document_id]
+        else:
+            return 0
+    else:
+        return 0
+
+def idf(term, index, length):
+    """"we give length=len(collection) as an argument to avoid calculating it at each iteration"""
+    try:
+        return log(length/len(index[term.lower()]))
+    except KeyError:
+        return 0
+
+def pTf(term, document):
+    return tf(term, document)
+
+def pTf_index(term, document, index):
+    return tf_index(term, document, index)
+
+def pDf(term, index, length):
+    return 1
+
+def generate_nd(collection, normalized = False):
+    tokenizer = RegexpTokenizer(r'\w+')
+    nd = dict()
+    for doc in collection.keys():
+        nd[doc]=1.
+    if not normalized:
+        return nd
+
+    for doc in collection.keys():
+        nbr_words = 0.
+        for line in collection[doc]:
+            nbr_words += len(tokenizer.tokenize(line))
+        nd[doc] /= nbr_words**.5
+
+    return nd
+
 def vectorialSearch(query, collection, index, pTf, pTf_index, pDf, generate_nd):
     length=len(collection)
     query_words=query.split()
