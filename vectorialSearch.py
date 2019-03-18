@@ -1,70 +1,79 @@
-from math import log
 from nltk.tokenize import RegexpTokenizer
+from tqdm import tqdm
+from math import log
+from bsbi import*
+import time
+import operator
 
-
-
-def tf(term,document):
-    tokenizer = RegexpTokenizer(r'\w+')
-    #potential optimization: remove count and make loop instead
-    return sum([tokenizer.tokenize(document[i].lower()).count(term.lower()) for i in range(len(document))])
-def idf(term, collection, length):
-    """"we give length=len(collection) as an argument to avoid calculating it at each iteration"""
-    try:
-        return log(length/len(index[term.lower()]))
-    except KeyError:
-        return 0
-def vectorialSearch(query, collection, index):
+def vectorialSearch(query, collection, index, pTf, pTf_index, pDf, generate_nd):
     length=len(collection)
     query_words=query.split()
-    Nd=dict()
+    Nd=generate_nd(collection)
 
-    for doc in collection.keys():
-        Nd[doc]=sum([1 for document in collection])
+    # for doc in collection.keys():
+    #     Nd[doc]=1
     Nq=0
     score=dict()
-    for j in range(1,length+1):
+    for j in collection.keys():
         score[j]=0
     W=dict()
     W['query_words']=dict()
-    for i in range(1,len(query_words)+1):
+    for query_word in query_words:
         try:
             # print("query_words",query_words)
             # print("collection",collection)
-            W['query_words'][query_words[i-1]]=tf(query_words[i-1],query)*idf(query_words[i-1], collection, length)
-            Nq+=(W['query_words'][query_words[i-1]])**2
-            L=index[query_words[i-1]].keys()
+            W['query_words'][query_word]=pTf(query_word,query)*pDf(query_word, index, length)
+            Nq+=(W['query_words'][query_word])**2
+            L=index[query_word].keys()
             # print("L", L)
 
             for j in L:
                 try:
-                    W[j][query_words[i - 1]]=Nd[j]*tf(query_words[i-1],C[j])*idf(query_words[i-1], collection, length)
+                    W[j][query_words[i - 1]]=Nd[j]*pTf_index(query_word,j, index)*pDf(query_word, index, length)
                 #if j not in W keys
                 except:
                     W[j]=dict()
-                    W[j][query_words[i - 1]]=Nd[j]*tf(query_words[i-1],C[j])*idf(query_words[i-1], collection, length)
-                score[j]+=(W[j][query_words[i-1]])**2
+                    W[j][query_word]=Nd[j]*pTf_index(query_word,j, index)*pDf(query_word, index, length)
+                score[j]+=(W[j][query_word])**2
         except KeyError:
             pass
-    for j in range(1,len(collection)+1):
+    for j in collection.keys():
         if ((Nd[j]*Nq)**0.5)!=0:
             score[j]=score[j]/((Nd[j]*Nq)**0.5)
 
     return score
 
 if __name__ == '__main__':
-    C = {1: ["aaa aaa eee\n", "bbb\n"], 2: ["ccc \n", "ddd\n"], 3: ["ccc eee\n", "a\n"]}
-    # length=len(C)
-    #index: the output of bsbi.py
-    index={'bbb': {1: 1}, 'eee': {1:2, 3: 1}, 'aaa': {1: 2, 2: 1}, 'ddd': {2: 1}, 'ccc': {2: 1, 3: 1}, "a":{3:1}}
-    print("Query : ", "'bbb'")
-    print("Document 1 is the only one containing 'bbb' ")
-    print(vectorialSearch("bbb", C, index),"\n")
+    raw_lines = extractRawLines()
+    docs = extractDocs(raw_lines)
+    t1=time.time()
+    index = invertBlock(docs)
+    t2=time.time()
+    print("\n\nIndexaton time :", t2-t1,)
 
-    print("Query : ", "'eee'")
-    print("Document 2 is the only one not containing  'eee' ")
-    print(vectorialSearch("eee", C, index),"\n")
+    print("\nVectorial Search Test and Evaluation\n")
+    print('Test 1 : ptf=tf, pdf=1, Nd=1\n')
 
-    print("Query : ", "'eee ccc'")
-    print("Document 2 is the only one not containing 'eee'  but containing 'ccc' ")
-    print("Document 1 and 2 have the same score. Document 3 has higher score because he contains both of the tokens 'eee' and 'ccc' ")
-    print(vectorialSearch("eee ccc", C, index))
+    for query in ['solve differential equations',
+                  'What articles exist which deal with TSS (Time Sharing System), an operating system for IBM computers?'
+                     ]:
+        print("\n\nQuery : '", query,"'")
+        t1 = time.time()
+        scores = vectorialSearch(query, docs, index, pTf, pTf_index, pDf, generate_nd)
+        sorted_scores = sorted(scores.items(), key=lambda kv: kv[1])
+        t2 = time.time()
+        print("Response time for this query :", t2 - t1)
+        print("\nThose are the best results : ")
+        for i in range(1, 10):
+            print("\tDocument", sorted_scores[-i][0], "with a score :", sorted_scores[-i][1])
+
+
+    print("")
+    print("Query (single word) : ", "'projects'")
+    scores = vectorialSearch("projects", docs, index, pTf, pTf_index, pDf, generate_nd)
+    print("\tScore of document 1 that do not contain 'projects' :", scores[1])
+    print("\tScore of document 1735 that contains 'projects' :", scores[1735])
+    print("\tScore of document 2311 that contains 'projects' :", scores[2311])
+
+
+
